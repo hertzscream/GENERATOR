@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GEN Monitor — FARM CHAKKARAT</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ═══════════════════════════════════════════════
+   TOKENS
+═══════════════════════════════════════════════ */
+:root {
+  --bg:         #080C14;
+  --bg2:        #0D1220;
+  --surface:    #111827;
+  --surface2:   #162032;
+  --border:     #1C2A3D;
+  --border2:    #243347;
+  --muted:      #2E3D52;
+  --text:       #E2E8F4;
+  --text2:      #94A3B8;
+  --dim:        #4F6180;
+
+  --green:      #22C55E;
+  --green-mid:  rgba(34,197,94,.18);
+  --green-lo:   rgba(34,197,94,.07);
+  --green-glow: rgba(34,197,94,.35);
+
+  --red:        #F43F5E;
+  --red-mid:    rgba(244,63,94,.18);
+  --red-lo:     rgba(244,63,94,.07);
+  --red-glow:   rgba(244,63,94,.35);
+
+  --amber:      #F59E0B;
+  --amber-lo:   rgba(245,158,11,.12);
+
+  --cyan:       #22D3EE;
+  --cyan-lo:    rgba(34,211,238,.08);
+  --cyan-glow:  rgba(34,211,238,.3);
+
+  --blue:       #3B82F6;
+  --purple:     #A78BFA;
+
+  --font:  'IBM Plex Sans Thai', sans-serif;
+  --mono:  'JetBrains Mono', monospace;
+
+  --r-card: 16px;
+  --r-sm:   8px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  min-height: 100vh;
+  font-size: 14px;
+  /* subtle grid texture */
+  background-image:
+    linear-gradient(rgba(34,211,238,.018) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34,211,238,.018) 1px, transparent 1px);
+  background-size: 40px 40px;
+}
+
+/* ─────────────────────────────────────────
+   PROGRESS BAR (refresh countdown)
+───────────────────────────────────────── */
+#refresh-bar-wrap {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 2px; z-index: 300; background: transparent;
+}
+#refresh-bar {
+  height: 100%;
+  background: linear-gradient(90deg, var(--cyan), var(--blue));
+  width: 100%;
+  transform-origin: left;
+  transition: transform linear;
+  box-shadow: 0 0 8px var(--cyan-glow);
+}
+
+/* ─────────────────────────────────────────
+   HEADER
+───────────────────────────────────────── */
+header {
+  background: rgba(13,18,32,.85);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 28px;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  position: sticky; top: 0; z-index: 200;
+}
+
+.logo {
+  display: flex; align-items: center; gap: 12px;
+}
+.logo-mark {
+  width: 34px; height: 34px;
+  border-radius: 9px;
+  background: linear-gradient(135deg, #1E3A5F 0%, #0B1929 100%);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  position: relative;
+  box-shadow: 0 0 0 1px rgba(34,211,238,.12), inset 0 1px 0 rgba(255,255,255,.05);
+}
+.logo-mark svg { width:16px; height:16px; }
+
+.logo-text {}
+.logo-title {
+  font-size: 13px; font-weight: 700;
+  letter-spacing: .06em; text-transform: uppercase;
+  color: var(--text); line-height: 1;
+}
+.logo-sub {
+  font-size: 10px; color: var(--dim);
+  letter-spacing: .08em; text-transform: uppercase;
+  margin-top: 2px;
+}
+
+.header-center {
+  display: flex; align-items: center; gap: 6px;
+}
+#live-date {
+  font-size: 11px; color: var(--dim);
+  font-family: var(--mono); letter-spacing: .04em;
+}
+.header-sep {
+  width: 1px; height: 14px;
+  background: var(--border2); margin: 0 4px;
+}
+#live-clock {
+  font-family: var(--mono); font-size: 15px;
+  font-weight: 600; color: var(--cyan);
+  letter-spacing: .08em;
+}
+
+.header-right { display: flex; align-items: center; gap: 10px; }
+
+#conn-badge {
+  display: flex; align-items: center; gap: 7px;
+  background: var(--bg2); border: 1px solid var(--border);
+  border-radius: 20px; padding: 5px 14px;
+  font-size: 11px; color: var(--dim);
+  font-family: var(--mono); letter-spacing: .03em;
+  transition: border-color .4s;
+}
+#conn-badge.ok  { border-color: rgba(34,197,94,.3); color: var(--green); }
+#conn-badge.err { border-color: rgba(244,63,94,.3);  color: var(--red); }
+
+#conn-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--amber); transition: all .4s;
+}
+#conn-dot.ok  { background: var(--green); box-shadow: 0 0 5px var(--green-glow); }
+#conn-dot.err { background: var(--red);   box-shadow: 0 0 5px var(--red-glow); }
+
+.refresh-btn {
+  width: 32px; height: 32px;
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-sm);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all .2s; color: var(--dim);
+}
+.refresh-btn:hover { border-color: var(--cyan); color: var(--cyan); }
+.refresh-btn svg { width:14px; height:14px; }
+.refresh-btn.spinning svg { animation: spin .7s linear infinite; }
+
+/* ─────────────────────────────────────────
+   MAIN
+───────────────────────────────────────── */
+main { max-width: 1140px; margin: 0 auto; padding: 28px 20px 80px; }
+
+.section-header {
+  display: flex; align-items: center; gap: 10px;
+  margin-bottom: 16px;
+}
+.section-eyebrow {
+  font-size: 10px; font-weight: 700;
+  letter-spacing: .14em; text-transform: uppercase;
+  color: var(--dim);
+}
+.section-line {
+  flex: 1; height: 1px; background: var(--border);
+}
+
+/* ─────────────────────────────────────────
+   GEN CARDS
+───────────────────────────────────────── */
+.gen-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 18px; margin-bottom: 28px;
+}
+
+.gen-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--r-card);
+  position: relative; overflow: hidden;
+  transition: border-color .4s, box-shadow .4s;
+  display: flex; flex-direction: column;
+}
+
+/* Signature: vertical accent bar left */
+.gen-card::before {
+  content: '';
+  position: absolute; left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--muted);
+  transition: background .4s, box-shadow .4s;
+}
+/* Ambient glow fill */
+.gen-card::after {
+  content: '';
+  position: absolute; inset: 0;
+  opacity: 0; transition: opacity .5s; pointer-events: none;
+}
+
+.gen-card.running {
+  border-color: rgba(34,197,94,.3);
+  box-shadow: 0 0 32px -8px rgba(34,197,94,.12);
+}
+.gen-card.running::before {
+  background: var(--green);
+  box-shadow: 2px 0 18px 0 var(--green-glow);
+}
+.gen-card.running::after { background: var(--green-lo); opacity: 1; }
+
+.gen-card.stopped {
+  border-color: rgba(244,63,94,.35);
+  box-shadow: 0 0 32px -8px rgba(244,63,94,.15);
+}
+.gen-card.stopped::before {
+  background: var(--red);
+  box-shadow: 2px 0 18px 0 var(--red-glow);
+  animation: bar-pulse-red 2s ease-in-out infinite;
+}
+.gen-card.stopped::after { background: var(--red-lo); opacity: 1; }
+
+.gen-card.offline { border-color: var(--border); }
+.gen-card.offline::before { background: var(--muted); }
+
+@keyframes bar-pulse-red {
+  0%,100% { box-shadow: 2px 0 12px 0 rgba(244,63,94,.3); }
+  50%      { box-shadow: 2px 0 28px 4px rgba(244,63,94,.6); }
+}
+
+/* Card top zone */
+.card-top {
+  padding: 22px 22px 18px 26px;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  gap: 12px;
+}
+.card-identity {}
+.card-machine-label {
+  font-size: 10px; font-weight: 600;
+  letter-spacing: .12em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 5px;
+}
+.card-kw {
+  font-family: var(--mono); font-size: 32px; font-weight: 700;
+  line-height: 1; letter-spacing: -.01em;
+}
+.card-kw-unit {
+  font-size: 14px; font-weight: 400; color: var(--dim);
+  margin-left: 2px;
+}
+
+/* Badge row */
+.badge-row {
+  display: flex; align-items: center; gap: 6px; margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.status-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  border-radius: 20px; padding: 4px 11px;
+  font-size: 11px; font-weight: 600; white-space: nowrap;
+  transition: all .35s; border: 1px solid transparent;
+}
+.pill-dot {
+  width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0;
+}
+.status-pill.running {
+  background: var(--green-mid); color: var(--green);
+  border-color: rgba(34,197,94,.25);
+}
+.status-pill.running .pill-dot {
+  background: var(--green); animation: pg 2.2s ease-in-out infinite;
+}
+.status-pill.stopped {
+  background: var(--red-mid); color: var(--red);
+  border-color: rgba(244,63,94,.25);
+}
+.status-pill.stopped .pill-dot {
+  background: var(--red); animation: pr 1.3s ease-in-out infinite;
+}
+.status-pill.neutral {
+  background: rgba(46,61,82,.5); color: var(--dim);
+  border-color: var(--border);
+}
+.status-pill.neutral .pill-dot { background: var(--muted); }
+
+.board-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-size: 10px; font-weight: 600; letter-spacing: .04em;
+  border-radius: 10px; padding: 3px 8px;
+  border: 1px solid transparent; transition: all .35s;
+}
+.board-badge.online {
+  background: var(--cyan-lo); color: var(--cyan);
+  border-color: rgba(34,211,238,.2);
+}
+.board-badge.online .bd { background: var(--cyan); animation: pg 3s ease-in-out infinite; }
+.board-badge.offline-bd {
+  background: rgba(46,61,82,.4); color: var(--muted);
+  border-color: var(--border);
+}
+.board-badge.offline-bd .bd { background: var(--muted); }
+.bd { width: 5px; height: 5px; border-radius: 50%; }
+
+@keyframes pg {
+  0%,100%{ box-shadow:0 0 0 0 currentColor; }
+  50%    { box-shadow:0 0 0 4px transparent; }
+}
+@keyframes pr {
+  0%,100%{ box-shadow:0 0 0 0 rgba(244,63,94,.7); }
+  50%    { box-shadow:0 0 0 5px rgba(244,63,94,0); }
+}
+
+/* Uptime bar */
+.uptime-wrap {
+  padding: 0 26px; margin-bottom: 14px;
+}
+.uptime-label-row {
+  display: flex; justify-content: space-between;
+  margin-bottom: 5px;
+}
+.uptime-label { font-size: 10px; color: var(--dim); font-weight: 500; letter-spacing:.04em; text-transform:uppercase; }
+.uptime-pct   { font-family: var(--mono); font-size: 11px; font-weight: 600; }
+.uptime-track {
+  height: 5px; background: var(--bg2);
+  border-radius: 3px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.uptime-fill {
+  height: 100%; border-radius: 3px;
+  transition: width 1s ease;
+  background: linear-gradient(90deg, var(--green), #4ADE80);
+}
+.uptime-fill.low  { background: linear-gradient(90deg, var(--red), #FB7185); }
+.uptime-fill.warn { background: linear-gradient(90deg, var(--amber), #FCD34D); }
+
+/* Card stats grid */
+.card-stats {
+  margin: 0 22px 0 26px;
+  padding: 14px 0;
+  border-top: 1px solid var(--border);
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px 10px;
+}
+.stat-item {}
+.stat-lbl {
+  font-size: 10px; color: var(--dim);
+  font-weight: 600; letter-spacing: .06em;
+  text-transform: uppercase; margin-bottom: 3px;
+}
+.stat-val {
+  font-family: var(--mono); font-size: 13px;
+  font-weight: 600; color: var(--text); line-height: 1.3;
+}
+.stat-val.green { color: var(--green); }
+.stat-val.red   { color: var(--red); }
+.stat-val.amber { color: var(--amber); }
+.stat-val.dim   { color: var(--dim); }
+.stat-sub {
+  font-size: 10px; color: var(--dim); margin-top: 1px;
+}
+.stat-sub.warn { color: var(--amber); }
+
+/* Card footer */
+.card-footer {
+  margin: 0 22px 18px 26px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.card-boot {
+  font-size: 10px; color: var(--dim);
+  font-family: var(--mono);
+}
+.card-boot span { color: var(--purple); }
+.offline-alert {
+  font-size: 10px; color: var(--red);
+  display: flex; align-items: center; gap: 4px;
+}
+
+/* ─────────────────────────────────────────
+   METRICS STRIP
+───────────────────────────────────────── */
+.metrics-strip {
+  display: grid; grid-template-columns: repeat(4,1fr);
+  gap: 12px; margin-bottom: 28px;
+}
+.metric-tile {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: 12px; padding: 16px 18px;
+  position: relative; overflow: hidden;
+  transition: border-color .3s;
+}
+.metric-tile::before {
+  content: '';
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 2px;
+  background: currentColor;
+  opacity: .15;
+}
+.tile-label {
+  font-size: 10px; color: var(--dim); font-weight: 600;
+  letter-spacing: .1em; text-transform: uppercase; margin-bottom: 10px;
+}
+.tile-value {
+  font-family: var(--mono); font-size: 22px;
+  font-weight: 700; line-height: 1;
+}
+.tile-sub { font-size: 10px; color: var(--dim); margin-top: 6px; }
+
+.tile-green { color: var(--green); border-bottom: 2px solid rgba(34,197,94,.2); }
+.tile-cyan  { color: var(--cyan);  border-bottom: 2px solid rgba(34,211,238,.2); }
+.tile-red   { color: var(--red);   border-bottom: 2px solid rgba(244,63,94,.2); }
+.tile-amber { color: var(--amber); border-bottom: 2px solid rgba(245,158,11,.2); }
+
+/* ─────────────────────────────────────────
+   LOG TABLE
+───────────────────────────────────────── */
+.log-section {
+  background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--r-card); overflow: hidden; margin-bottom: 14px;
+}
+.log-header {
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border);
+  background: var(--bg2);
+}
+.log-header-left { display: flex; align-items: center; gap: 10px; }
+.log-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  background: var(--surface2); border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+}
+.log-icon svg { width:13px; height:13px; color: var(--cyan); }
+.log-title { font-size: 13px; font-weight: 600; }
+.log-title-sub { font-size: 10px; color: var(--dim); margin-top: 1px; }
+
+.log-controls { display: flex; align-items: center; gap: 8px; }
+.filter-btn {
+  font-size: 11px; font-family: var(--mono);
+  padding: 4px 11px; border-radius: 6px; cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--dim);
+  transition: all .2s;
+}
+.filter-btn:hover, .filter-btn.active { border-color: var(--cyan); color: var(--cyan); background: var(--cyan-lo); }
+.filter-btn.active550 { border-color: var(--blue); color: #60A5FA; background: rgba(59,130,246,.1); }
+.filter-btn.active370 { border-color: var(--amber); color: var(--amber); background: var(--amber-lo); }
+
+.log-count {
+  font-family: var(--mono); font-size: 11px; color: var(--dim);
+  background: var(--bg); border: 1px solid var(--border);
+  border-radius: 8px; padding: 3px 10px;
+}
+
+.log-table-wrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; }
+thead th {
+  padding: 9px 18px; font-size: 10px; font-weight: 700;
+  letter-spacing: .1em; text-transform: uppercase;
+  color: var(--dim); text-align: left;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+tbody tr {
+  border-bottom: 1px solid rgba(28,42,61,.7);
+  transition: background .15s;
+}
+tbody tr:last-child { border-bottom: none; }
+tbody tr:hover { background: rgba(255,255,255,.025); }
+tbody tr.row-highlight { background: rgba(244,63,94,.05); }
+tbody td { padding: 11px 18px; font-size: 12px; vertical-align: middle; }
+
+.badge-m {
+  font-size: 10px; font-family: var(--mono);
+  font-weight: 600; padding: 2px 8px; border-radius: 5px;
+  letter-spacing: .04em;
+}
+.badge-m.m550 { background: rgba(59,130,246,.15); color: #60A5FA; border: 1px solid rgba(59,130,246,.2); }
+.badge-m.m370 { background: rgba(245,158,11,.15); color: #FCD34D; border: 1px solid rgba(245,158,11,.2); }
+
+td.td-mono { font-family: var(--mono); font-size: 11px; color: var(--text2); }
+td.td-dur  { font-family: var(--mono); font-size: 11px; color: var(--amber); font-weight:600; }
+td.td-dur.long { color: var(--red); }
+td.td-total{ font-family: var(--mono); font-size: 11px; color: var(--cyan); }
+
+/* ─────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────── */
+.dash-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2px;
+}
+.footer-sync {
+  font-size: 10px; color: var(--dim);
+  font-family: var(--mono); display: flex; align-items: center; gap: 8px;
+}
+.footer-next {
+  font-size: 10px; color: var(--muted); font-family: var(--mono);
+}
+
+/* ─────────────────────────────────────────
+   LOADING
+───────────────────────────────────────── */
+#loading {
+  position: fixed; inset: 0;
+  background: var(--bg);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  gap: 18px; z-index: 999; transition: opacity .5s;
+}
+#loading.hide { opacity:0; pointer-events:none; }
+.spin { width:36px; height:36px; border:2px solid var(--border2); border-top-color:var(--cyan); border-radius:50%; animation:spin .7s linear infinite; }
+@keyframes spin { to { transform:rotate(360deg); } }
+#loading p { color:var(--dim); font-size:12px; font-family:var(--mono); }
+
+/* ─────────────────────────────────────────
+   ERROR BANNER
+───────────────────────────────────────── */
+#error-banner {
+  display: none;
+  background: rgba(244,63,94,.08); border: 1px solid rgba(244,63,94,.25);
+  border-radius: 10px; padding: 11px 16px;
+  margin-bottom: 20px; font-size: 12px; color: var(--red);
+  display: none; align-items: center; gap: 8px;
+}
+
+/* ─────────────────────────────────────────
+   TOAST
+───────────────────────────────────────── */
+#toast {
+  position: fixed; bottom: 28px; left: 50%;
+  transform: translateX(-50%) translateY(70px);
+  background: var(--surface2); border: 1px solid var(--border2);
+  border-radius: 10px; padding: 9px 18px;
+  font-size: 12px; color: var(--text2);
+  backdrop-filter: blur(12px);
+  transition: transform .28s cubic-bezier(.34,1.56,.64,1);
+  z-index: 999; pointer-events: none; white-space: nowrap;
+  box-shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+#toast.show { transform: translateX(-50%) translateY(0); }
+
+/* ─────────────────────────────────────────
+   EMPTY STATE
+───────────────────────────────────────── */
+.empty-row td {
+  text-align:center; color:var(--dim);
+  padding:40px; font-size:12px; font-family:var(--mono);
+}
+
+/* ─────────────────────────────────────────
+   ALARM PULSE (card-level)
+───────────────────────────────────────── */
+.gen-card.alarm {
+  animation: card-alarm 2s ease-in-out infinite;
+}
+@keyframes card-alarm {
+  0%,100% { box-shadow: 0 0 24px -8px rgba(244,63,94,.15); }
+  50%      { box-shadow: 0 0 40px -4px rgba(244,63,94,.4); }
+}
+
+/* ─────────────────────────────────────────
+   RESPONSIVE
+───────────────────────────────────────── */
+@media (max-width: 760px) {
+  .gen-grid       { grid-template-columns: 1fr; }
+  .metrics-strip  { grid-template-columns: 1fr 1fr; }
+  .card-kw        { font-size: 26px; }
+  header          { padding: 0 16px; }
+  main            { padding: 20px 14px 60px; }
+  .header-center  { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation: none !important; transition: none !important; }
+}
+</style>
+</head>
+<body>
+
+<!-- Refresh countdown bar -->
+<div id="refresh-bar-wrap">
+  <div id="refresh-bar"></div>
+</div>
+
+<!-- Loading -->
+<div id="loading">
+  <div class="spin"></div>
+  <p>กำลังโหลดข้อมูล…</p>
+</div>
+
+<!-- ══════════════ HEADER ══════════════ -->
+<header>
+  <div class="logo">
+    <div class="logo-mark">
+      <svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+      </svg>
+    </div>
+    <div class="logo-text">
+      <div class="logo-title">GEN Monitor</div>
+      <div class="logo-sub">Farm Chakkarat</div>
+    </div>
+  </div>
+
+  <div class="header-center">
+    <span id="live-date">—</span>
+    <span class="header-sep"></span>
+    <span id="live-clock">--:--:--</span>
+  </div>
+
+  <div class="header-right">
+    <div id="conn-badge">
+      <span id="conn-dot"></span>
+      <span id="conn-text">กำลังเชื่อมต่อ…</span>
+    </div>
+    <button class="refresh-btn" id="refresh-btn" title="รีเฟรชทันที" onclick="manualRefresh()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+        <path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/>
+        <path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/>
+        <path d="M8 16H3v5"/>
+      </svg>
+    </button>
+  </div>
+</header>
+
+<!-- ══════════════ MAIN ══════════════ -->
+<main>
+  <div id="error-banner">⚠ ไม่สามารถรับข้อมูล — ตรวจสอบ GAS_URL</div>
+
+  <!-- GEN STATUS CARDS -->
+  <div class="section-header">
+    <span class="section-eyebrow">สถานะเครื่องปั่นไฟ</span>
+    <span class="section-line"></span>
+  </div>
+
+  <div class="gen-grid">
+
+    <!-- ── GEN 550 KW ── -->
+    <div class="gen-card offline" id="card-550">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-machine-label">Generator A</div>
+          <div class="card-kw" style="color:var(--cyan)">550<span class="card-kw-unit">kW</span></div>
+          <div class="badge-row">
+            <div class="status-pill neutral" id="pill-550">
+              <span class="pill-dot"></span>
+              <span id="pill-550-text">รอข้อมูล</span>
+            </div>
+            <div class="board-badge offline-bd" id="bb-550">
+              <span class="bd"></span>
+              <span id="bb-550-text">ESP32</span>
+            </div>
+          </div>
+        </div>
+        <!-- icon -->
+        <div style="opacity:.15; flex-shrink:0; margin-top:4px;">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--cyan)" stroke-width="1.2" stroke-linecap="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            <line x1="12" y1="12" x2="12" y2="16"/>
+            <line x1="10" y1="14" x2="14" y2="14"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Uptime bar -->
+      <div class="uptime-wrap">
+        <div class="uptime-label-row">
+          <span class="uptime-label">Uptime วันนี้</span>
+          <span class="uptime-pct" id="uptime-pct-550" style="color:var(--green)">—</span>
+        </div>
+        <div class="uptime-track">
+          <div class="uptime-fill" id="uptime-fill-550" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="card-stats">
+        <div class="stat-item">
+          <div class="stat-lbl">สถานะเครื่อง</div>
+          <div class="stat-val" id="mstatus-550">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Last Ping</div>
+          <div class="stat-val" id="ping-550">—</div>
+          <div class="stat-sub" id="ping-age-550"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">ดับ Offline นาน</div>
+          <div class="stat-val red" id="offdur-550">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Offline ตั้งแต่</div>
+          <div class="stat-val" id="offsince-550">—</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-boot">BOOT <span id="boot-550">—</span></div>
+        <div class="offline-alert" id="offalert-550" style="display:none">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span id="offalert-550-text">แจ้งเตือน Offline แล้ว</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- ── GEN 370 KW ── -->
+    <div class="gen-card offline" id="card-370">
+      <div class="card-top">
+        <div class="card-identity">
+          <div class="card-machine-label">Generator B</div>
+          <div class="card-kw" style="color:var(--amber)">370<span class="card-kw-unit">kW</span></div>
+          <div class="badge-row">
+            <div class="status-pill neutral" id="pill-370">
+              <span class="pill-dot"></span>
+              <span id="pill-370-text">รอข้อมูล</span>
+            </div>
+            <div class="board-badge offline-bd" id="bb-370">
+              <span class="bd"></span>
+              <span id="bb-370-text">ESP32</span>
+            </div>
+          </div>
+        </div>
+        <div style="opacity:.15; flex-shrink:0; margin-top:4px;">
+          <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="var(--amber)" stroke-width="1.2" stroke-linecap="round">
+            <rect x="2" y="7" width="20" height="14" rx="2"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/>
+            <line x1="12" y1="12" x2="12" y2="16"/>
+            <line x1="10" y1="14" x2="14" y2="14"/>
+          </svg>
+        </div>
+      </div>
+
+      <div class="uptime-wrap">
+        <div class="uptime-label-row">
+          <span class="uptime-label">Uptime วันนี้</span>
+          <span class="uptime-pct" id="uptime-pct-370" style="color:var(--green)">—</span>
+        </div>
+        <div class="uptime-track">
+          <div class="uptime-fill" id="uptime-fill-370" style="width:0%"></div>
+        </div>
+      </div>
+
+      <div class="card-stats">
+        <div class="stat-item">
+          <div class="stat-lbl">สถานะเครื่อง</div>
+          <div class="stat-val" id="mstatus-370">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Last Ping</div>
+          <div class="stat-val" id="ping-370">—</div>
+          <div class="stat-sub" id="ping-age-370"></div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">ดับ Offline นาน</div>
+          <div class="stat-val red" id="offdur-370">—</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-lbl">Offline ตั้งแต่</div>
+          <div class="stat-val" id="offsince-370">—</div>
+        </div>
+      </div>
+      <div class="card-footer">
+        <div class="card-boot">BOOT <span id="boot-370">—</span></div>
+        <div class="offline-alert" id="offalert-370" style="display:none">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span id="offalert-370-text">แจ้งเตือน Offline แล้ว</span>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /gen-grid -->
+
+  <!-- METRICS STRIP -->
+  <div class="section-header">
+    <span class="section-eyebrow">ภาพรวมระบบ</span>
+    <span class="section-line"></span>
+  </div>
+  <div class="metrics-strip">
+    <div class="metric-tile tile-green">
+      <div class="tile-label">บอร์ดออนไลน์</div>
+      <div class="tile-value" id="m-boards">— / 2</div>
+      <div class="tile-sub">ESP32 บอร์ด</div>
+    </div>
+    <div class="metric-tile tile-cyan">
+      <div class="tile-label">เครื่องที่ทำงาน</div>
+      <div class="tile-value" id="m-run">— / 2</div>
+      <div class="tile-sub">เครื่องปั่นไฟ</div>
+    </div>
+    <div class="metric-tile tile-red">
+      <div class="tile-label">บอร์ด Offline</div>
+      <div class="tile-value" id="m-offline">—</div>
+      <div class="tile-sub">เกิน 10 นาที</div>
+    </div>
+    <div class="metric-tile tile-amber">
+      <div class="tile-label">Log เหตุการณ์</div>
+      <div class="tile-value" id="m-events">—</div>
+      <div class="tile-sub">รายการสะสม</div>
+    </div>
+  </div>
+
+  <!-- LOG TABLE -->
+  <div class="section-header">
+    <span class="section-eyebrow">ประวัติเหตุการณ์</span>
+    <span class="section-line"></span>
+  </div>
+  <div class="log-section">
+    <div class="log-header">
+      <div class="log-header-left">
+        <div class="log-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+            <polyline points="14 2 14 8 20 8"/>
+            <line x1="16" y1="13" x2="8" y2="13"/>
+            <line x1="16" y1="17" x2="8" y2="17"/>
+          </svg>
+        </div>
+        <div>
+          <div class="log-title">บันทึกการดับ / ติด เครื่องปั่นไฟ</div>
+          <div class="log-title-sub">ดึงจาก Google Sheet — Sheet "Log"</div>
+        </div>
+      </div>
+      <div class="log-controls">
+        <button class="filter-btn active" id="f-all" onclick="setFilter('all')">ทั้งหมด</button>
+        <button class="filter-btn" id="f-550" onclick="setFilter('550')">550 kW</button>
+        <button class="filter-btn" id="f-370" onclick="setFilter('370')">370 kW</button>
+        <span class="log-count" id="log-count">—</span>
+      </div>
+    </div>
+    <div class="log-table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>เครื่อง</th>
+            <th>วันที่</th>
+            <th>เวลาดับ</th>
+            <th>เวลาติด</th>
+            <th>ระยะเวลาดับ</th>
+            <th>สะสมรวม</th>
+          </tr>
+        </thead>
+        <tbody id="log-body">
+          <tr class="empty-row"><td colspan="6">⏳ รอข้อมูล…</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="dash-footer">
+    <div class="footer-sync">
+      <span style="color:var(--muted)">LAST SYNC</span>
+      <span id="last-sync">—</span>
+    </div>
+    <div class="footer-next" id="next-poll"></div>
+  </div>
+
+</main>
+
+<div id="toast"></div>
+
+<!-- ══════════════ SCRIPT ══════════════ -->
+<script>
+/* ═══════════════════════════════════════════════════
+   ⚙️  CONFIG
+═══════════════════════════════════════════════════ */
+const GAS_URL = "https://script.google.com/macros/s/AKfycbynD6wjXg1LrIzUQGeYaI5IOgmnk4krb3erBvTnG1m_fxIXmhELb6HNxAVgsbmmQ-p90w/exec";
+
+const M550 = "เครื่อง 550 KW";
+const M370 = "เครื่อง 370 KW";
+
+/* ═══════════════════════════════════════════════════
+   STATE
+═══════════════════════════════════════════════════ */
+let allLogs    = [];
+let activeFilter = "all";
+let prevHash   = "";
+let pollTimer  = null;
+let countdownInterval = null;
+
+/* ═══════════════════════════════════════════════════
+   HELPERS
+═══════════════════════════════════════════════════ */
+const pad = n => String(n).padStart(2,"0");
+const $ = id => document.getElementById(id);
+
+function showToast(msg){
+  const t = $("toast");
+  t.textContent = msg; t.classList.add("show");
+  setTimeout(()=>t.classList.remove("show"), 3000);
+}
+
+function showError(msg){
+  const b = $("error-banner");
+  b.style.display = msg ? "flex" : "none";
+  if(msg) b.childNodes[1].textContent = " " + msg;
+}
+
+/* ─── Clock + Date ─── */
+const DAYS_TH = ["อาทิตย์","จันทร์","อังคาร","พุธ","พฤหัสบดี","ศุกร์","เสาร์"];
+const MONTHS_TH = ["ม.ค.","ก.พ.","มี.ค.","เม.ย.","พ.ค.","มิ.ย.","ก.ค.","ส.ค.","ก.ย.","ต.ค.","พ.ย.","ธ.ค."];
+function tickClock(){
+  const d = new Date();
+  $("live-clock").textContent = `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  $("live-date").textContent  = `${DAYS_TH[d.getDay()]} ${d.getDate()} ${MONTHS_TH[d.getMonth()]} ${d.getFullYear()+543}`;
+}
+setInterval(tickClock,1000); tickClock();
+
+/* ─── Connection badge ─── */
+function setConn(state){
+  const badge = $("conn-badge");
+  const dot   = $("conn-dot");
+  const text  = $("conn-text");
+  badge.className = state;
+  dot.className   = state;
+  text.textContent = state==="ok" ? "เชื่อมต่อแล้ว"
+                   : state==="err"? "เชื่อมต่อไม่ได้"
+                   : "กำลังเชื่อมต่อ…";
+}
+
+/* ─── Refresh button spinner ─── */
+function setRefreshSpinner(on){
+  $("refresh-btn").classList.toggle("spinning", on);
+}
+
+/* ─── Countdown progress bar ─── */
+function startCountdownBar(ms){
+  const bar = $("refresh-bar");
+  const nextEl = $("next-poll");
+  clearInterval(countdownInterval);
+
+  bar.style.transition = "none";
+  bar.style.transform  = "scaleX(1)";
+
+  requestAnimationFrame(()=>{
+    requestAnimationFrame(()=>{
+      bar.style.transition = `transform ${ms}ms linear`;
+      bar.style.transform  = "scaleX(0)";
+    });
+  });
+
+  let remain = Math.round(ms/1000);
+  nextEl.textContent = `refresh ใน ${remain}s`;
+  countdownInterval = setInterval(()=>{
+    remain--;
+    if(remain <= 0){ clearInterval(countdownInterval); nextEl.textContent=""; return; }
+    nextEl.textContent = `refresh ใน ${remain}s`;
+  }, 1000);
+}
+
+/* ═══════════════════════════════════════════════════
+   UPTIME CALC
+   ใช้ totalOff จาก GAS เทียบกับเวลาผ่านมาของวัน
+═══════════════════════════════════════════════════ */
+function parseHMS(str){
+  if(!str || str === "—" || str === "-") return null;
+  const parts = String(str).split(":").map(Number);
+  if(parts.length < 3) return null;
+  return parts[0]*3600 + parts[1]*60 + parts[2];
+}
+
+function calcUptime(totalOffDuration){
+  const now = new Date();
+  const daySeconds = now.getHours()*3600 + now.getMinutes()*60 + now.getSeconds();
+  if(daySeconds < 10) return null;
+  const offSec = parseHMS(totalOffDuration) || 0;
+  const upSec  = Math.max(0, daySeconds - offSec);
+  return Math.min(100, Math.round((upSec / daySeconds) * 100));
+}
+
+function setUptimeBar(suffix, row){
+  const totalOff = row ? row.offlineDuration : null;
+  const pct = calcUptime(totalOff);
+  const pctEl  = $(`uptime-pct-${suffix}`);
+  const fillEl = $(`uptime-fill-${suffix}`);
+  if(pct === null){ pctEl.textContent="—"; fillEl.style.width="0%"; return; }
+  pctEl.textContent = `${pct}%`;
+  fillEl.style.width = `${pct}%`;
+  fillEl.className = "uptime-fill" + (pct < 50 ? " low" : pct < 85 ? " warn" : "");
+  pctEl.style.color = pct < 50 ? "var(--red)" : pct < 85 ? "var(--amber)" : "var(--green)";
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER CARD
+═══════════════════════════════════════════════════ */
+function renderCard(suffix, row){
+  const card     = $(`card-${suffix}`);
+  const pill     = $(`pill-${suffix}`);
+  const pillTxt  = $(`pill-${suffix}-text`);
+  const bb       = $(`bb-${suffix}`);
+  const bbTxt    = $(`bb-${suffix}-text`);
+
+  if(!row){
+    card.className = "gen-card offline";
+    pill.className = "status-pill neutral"; pillTxt.textContent = "ไม่มีข้อมูล";
+    bb.className   = "board-badge offline-bd"; bbTxt.textContent = "ESP32";
+    setUptimeBar(suffix, null);
+    return;
+  }
+
+  const boardOnline = row.boardStatus === "Online";
+  const machineRun  = String(row.machineStatus||"").toUpperCase() === "RUN";
+
+  /* Card class */
+  if(!boardOnline)      card.className = "gen-card offline";
+  else if(machineRun)   card.className = "gen-card running";
+  else                  card.className = "gen-card stopped alarm";
+
+  /* Status pill */
+  if(!boardOnline){
+    pill.className = "status-pill neutral"; pillTxt.textContent = "บอร์ด Offline";
+  } else if(machineRun){
+    pill.className = "status-pill running"; pillTxt.textContent = "เครื่องทำงานปกติ";
+  } else {
+    pill.className = "status-pill stopped"; pillTxt.textContent = "เครื่องดับ ⚠";
+  }
+
+  /* Board badge */
+  bb.className  = "board-badge " + (boardOnline ? "online" : "offline-bd");
+  bbTxt.textContent = boardOnline ? "ESP32 · Online" : "ESP32 · Offline";
+
+  /* Stats */
+  const ms = $(`mstatus-${suffix}`);
+  ms.textContent  = row.machineStatus || "—";
+  ms.className    = "stat-val " + (machineRun ? "green" : boardOnline ? "red" : "dim");
+
+  $(`ping-${suffix}`).textContent = row.lastPing || "—";
+
+  const pingAge = $(`ping-age-${suffix}`);
+  if(row.diffMinutes !== null && row.diffMinutes !== undefined){
+    const m = row.diffMinutes;
+    pingAge.textContent = m < 1 ? "เมื่อกี้นี้" : `${m} นาทีที่แล้ว`;
+    pingAge.className   = "stat-sub" + (m >= 8 ? " warn" : "");
+  } else {
+    pingAge.textContent = ""; pingAge.className = "stat-sub";
+  }
+
+  $(`offdur-${suffix}`).textContent  = row.offlineDuration !== "-" ? row.offlineDuration : "—";
+  $(`offsince-${suffix}`).textContent= row.offlineSince    !== "-" ? row.offlineSince   : "—";
+  $(`boot-${suffix}`).textContent    = row.bootCount       !== "-" ? `#${row.bootCount}`: "—";
+
+  /* Offline alert indicator */
+  const alertEl = $(`offalert-${suffix}`);
+  if(row.offlineAlertAt && row.offlineAlertAt !== "-"){
+    alertEl.style.display = "flex";
+    $(`offalert-${suffix}-text`).textContent = `แจ้งเตือน ${row.offlineAlertAt}`;
+  } else {
+    alertEl.style.display = "none";
+  }
+
+  setUptimeBar(suffix, row);
+}
+
+/* ═══════════════════════════════════════════════════
+   RENDER METRICS
+═══════════════════════════════════════════════════ */
+function renderMetrics(summary, logCount){
+  $("m-boards").textContent  = `${summary.online} / ${summary.total}`;
+  $("m-run").textContent     = `${summary.run} / ${summary.total}`;
+  $("m-offline").textContent = summary.offline;
+  $("m-events").textContent  = logCount;
+}
+
+/* ═══════════════════════════════════════════════════
+   LOG FILTER + RENDER
+═══════════════════════════════════════════════════ */
+function setFilter(f){
+  activeFilter = f;
+  ["all","550","370"].forEach(k=>{
+    const btn = $(`f-${k}`);
+    btn.className = "filter-btn" + (k===f
+      ? (k==="all" ? " active" : k==="550" ? " active550" : " active370")
+      : "");
+  });
+  renderLogs(allLogs);
+}
+
+function parseDurSeconds(str){
+  const s = parseHMS(str);
+  return s || 0;
+}
+
+function renderLogs(rows){
+  const filtered = activeFilter === "all"
+    ? rows
+    : rows.filter(r => String(r.machine||"").includes(activeFilter));
+
+  $("log-count").textContent = `${filtered.length} รายการ`;
+  const tbody = $("log-body");
+
+  if(!filtered.length){
+    tbody.innerHTML = `<tr class="empty-row"><td colspan="6">— ไม่มีรายการ —</td></tr>`;
+    return;
+  }
+
+  const LONG_SEC = 1800; // 30 นาที = highlight row
+  tbody.innerHTML = filtered.slice().reverse().slice(0,60).map(r=>{
+    const is550 = String(r.machine||"").includes("550");
+    const cls   = is550 ? "m550" : "m370";
+    const label = is550 ? "550 kW" : "370 kW";
+    const durSec = parseDurSeconds(r.duration);
+    const rowCls = durSec >= LONG_SEC ? " class=\"row-highlight\"" : "";
+    const durCls = durSec >= LONG_SEC ? " long" : "";
+    return `<tr${rowCls}>
+      <td><span class="badge-m ${cls}">${label}</span></td>
+      <td class="td-mono">${r.date||"—"}</td>
+      <td class="td-mono">${r.time_off||"—"}</td>
+      <td class="td-mono">${r.time_on||"—"}</td>
+      <td class="td-dur${durCls}">${r.duration||"—"}</td>
+      <td class="td-total">${r.total_all||"—"}</td>
+    </tr>`;
+  }).join("");
+}
+
+/* ═══════════════════════════════════════════════════
+   FETCH
+═══════════════════════════════════════════════════ */
+async function fetchAll(){
+  const [r1, r2] = await Promise.allSettled([
+    fetch(`${GAS_URL}?action=getDashboardData`,{cache:"no-store"}),
+    fetch(`${GAS_URL}?action=getLogs`,{cache:"no-store"})
+  ]);
+
+  let statusData = null;
+  let logRows    = [];
+
+  if(r1.status==="fulfilled" && r1.value.ok){
+    try { statusData = await r1.value.json(); } catch(e){}
+  }
+  if(r2.status==="fulfilled" && r2.value.ok){
+    try {
+      const j = await r2.value.json();
+      logRows = Array.isArray(j) ? j : (j.logs||[]);
+    } catch(e){}
+  }
+  return { statusData, logRows };
+}
+
+/* ═══════════════════════════════════════════════════
+   POLL
+═══════════════════════════════════════════════════ */
+async function poll(){
+  setConn("");
+  setRefreshSpinner(true);
+  clearTimeout(pollTimer);
+  clearInterval(countdownInterval);
+  $("refresh-bar").style.transition="none";
+  $("refresh-bar").style.transform="scaleX(1)";
+
+  try {
+    const { statusData, logRows } = await fetchAll();
+
+    if(statusData){
+      setConn("ok"); showError(null);
+      const rows = statusData.rows || [];
+      const find = name => rows.find(r=>r.machine===name)||null;
+      renderCard("550", find(M550));
+      renderCard("370", find(M370));
+      renderMetrics(statusData.summary||{total:0,online:0,offline:0,run:0,stop:0}, logRows.length);
+    } else {
+      setConn("err");
+      showError("ไม่สามารถรับข้อมูลจาก Google Apps Script — ตรวจสอบ GAS_URL และการ Deploy");
+      renderCard("550",null); renderCard("370",null);
+      renderMetrics({total:2,online:0,offline:0,run:0,stop:0},0);
+    }
+
+    allLogs = logRows;
+    renderLogs(allLogs);
+
+    /* Change detection */
+    const hash = JSON.stringify({ s: statusData?.rows, lc: logRows.length });
+    if(hash !== prevHash && prevHash !== "") showToast("🔄 ข้อมูลอัปเดตแล้ว");
+    prevHash = hash;
+
+    const now = new Date();
+    $("last-sync").textContent = `${pad(now.getHours())}:${pad(now.getMinutes())}:${pad(now.getSeconds())}`;
+
+  } catch(e){
+    setConn("err"); showError("เกิดข้อผิดพลาด: "+e.message);
+    console.error(e);
+  }
+
+  setRefreshSpinner(false);
+  $("loading").classList.add("hide");
+
+  /* Adaptive interval */
+  const anyDown = document.querySelector(".gen-card.stopped,.gen-card.offline");
+  const delay   = anyDown ? 8000 : 15000;
+
+  startCountdownBar(delay);
+  pollTimer = setTimeout(poll, delay);
+}
+
+/* Manual refresh */
+function manualRefresh(){
+  clearTimeout(pollTimer);
+  clearInterval(countdownInterval);
+  poll();
+}
+
+/* Page Visibility */
+document.addEventListener("visibilitychange", ()=>{
+  if(document.hidden){
+    clearTimeout(pollTimer); clearInterval(countdownInterval);
+    $("next-poll").textContent="";
+    $("refresh-bar").style.transition="none";
+    $("refresh-bar").style.transform="scaleX(0)";
+  } else {
+    poll();
+  }
+});
+
+/* Boot */
+poll();
+</script>
+</body>
+</html>
