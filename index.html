@@ -345,6 +345,8 @@ const M550="เครื่อง 550 KW", M370="เครื่อง 370 KW", 
 let allLogs=[],activeFilter="all",prevHash="",pollTimer=null,cdInterval=null;
 const pad=n=>String(n).padStart(2,"0");
 const $=id=>document.getElementById(id);
+const $s=(id,prop,val)=>{ const el=document.getElementById(id); if(el) el[prop]=val; };
+const $c=(id,cls)=>{ const el=document.getElementById(id); if(el) el.className=cls; };
 
 function nowBKK(){ return new Date(new Date().toLocaleString("en-US",{timeZone:TZ})); }
 
@@ -359,7 +361,7 @@ setInterval(tickClock,1000); tickClock();
 
 /* GAUGE */
 function setGauge(sx,state){
-  const arc=$(` + '"garc-"+sx' + `), txt=$(` + '"gtxt-"+sx' + `);
+  const arc=$("garc-"+sx), txt=$("gtxt-"+sx);
   if(!arc||!txt) return;
   if(state==="run"){
     arc.style.stroke="var(--green)";arc.style.filter="drop-shadow(0 0 5px var(--green-glow))";
@@ -375,7 +377,7 @@ function setGauge(sx,state){
 
 /* PHOTO STATUS */
 function setPS(sx,state){
-  const el=$(` + '"ps-"+sx' + `), txt=$(` + '"ps-"+sx+"-txt"' + `);
+  const el=$("ps-"+sx), txt=$("ps-"+sx+"-txt");
   if(!el||!txt) return;
   if(state==="run"){el.className="photo-status ps-run";txt.textContent="เครื่องทำงาน";}
   else if(state==="stop"){el.className="photo-status ps-stop";txt.textContent="⚠ เครื่องดับ";}
@@ -403,7 +405,7 @@ function parseHMS(s){
 }
 function setUptime(sx,offStr){
   const d=nowBKK(), ds=d.getHours()*3600+d.getMinutes()*60+d.getSeconds();
-  const pe=$(` + '"upct-"+sx' + `),fe=$(` + '"ufill-"+sx' + `);
+  const pe=$("upct-"+sx),fe=$("ufill-"+sx);
   if(ds<10){pe.textContent="—";fe.style.width="0%";return;}
   const off=parseHMS(offStr)||0;
   const pct=Math.min(100,Math.round((Math.max(0,ds-off)/ds)*100));
@@ -414,9 +416,8 @@ function setUptime(sx,offStr){
 
 /* CONN */
 function setConn(s){
-  const b=$("conn-badge"),d=$("conn-dot"),t=$("conn-text");
-  b.className=s;d.className=s;
-  t.textContent=s==="ok"?"เชื่อมต่อแล้ว":s==="err"?"เชื่อมต่อไม่ได้":"กำลังเชื่อมต่อ…";
+  $c("conn-badge",s); $c("conn-dot",s);
+  $s("conn-text","textContent",s==="ok"?"เชื่อมต่อแล้ว":s==="err"?"เชื่อมต่อไม่ได้":"กำลังเชื่อมต่อ…");
 }
 function showError(msg){
   const b=$("err-banner");
@@ -428,7 +429,7 @@ function showError(msg){
   }
 }
 function showToast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),3000);}
-function setSpin(on){$("rbtn").classList.toggle("spinning",on);}
+function setSpin(on){ const b=$("rbtn"); if(b) b.classList.toggle("spinning",on); }
 
 function startCd(ms){
   const bar=$("rbar"),np=$("next-poll");
@@ -444,31 +445,31 @@ function startCd(ms){
 
 /* RENDER CARD */
 function renderCard(sx,row){
-  const card=$(` + '"card-"+sx' + `);
+  const card=$("card-"+sx);
   if(!row){
     card.className="gen-card offline"; setGauge(sx,"off"); setPS(sx,"off");
-    $(` + '"bb-"+sx' + `).className="bb offline-bd"; $(` + '"bb-"+sx+"-txt"' + `).textContent="ESP32 · ออฟไลน์";
+    $("bb-"+sx).className="bb offline-bd"; $("bb-"+sx+"-txt").textContent="ESP32 · ออฟไลน์";
     setUptime(sx,null); return;
   }
   const online=row.boardStatus==="Online", run=String(row.machineStatus||"").toUpperCase()==="RUN";
   const gs=!online?"off":run?"run":"stop";
   card.className="gen-card "+(online?(run?"running":"stopped"):"offline");
   setGauge(sx,gs); setPS(sx,gs);
-  const bb=$(` + '"bb-"+sx' + `);
+  const bb=$("bb-"+sx);
   bb.className="bb "+(online?"online":"offline-bd");
-  $(` + '"bb-"+sx+"-txt"' + `).textContent=online?"ESP32 · ออนไลน์":"ESP32 · ออฟไลน์";
-  $(` + '"ping-"+sx' + `).textContent=row.lastPing||"—";
-  const pa=$(` + '"page-"+sx' + `);
+  $("bb-"+sx+"-txt").textContent=online?"ESP32 · ออนไลน์":"ESP32 · ออฟไลน์";
+  $("ping-"+sx).textContent=row.lastPing||"—";
+  const pa=$("page-"+sx);
   if(row.diffMinutes!=null){
-    const m=row.diffMinutes;pa.textContent=m<1?"เมื่อกี้นี้":`${m} นาทีที่แล้ว`;
-    pa.className="infosub"+(m>=8?" warn":"");
-  } else {pa.textContent="";pa.className="infosub";}
-  $(` + '"offdur-"+sx' + `).textContent=row.offlineDuration&&row.offlineDuration!=="-"?row.offlineDuration:"—";
-  $(` + '"offsince-"+sx' + `).textContent=row.offlineSince&&row.offlineSince!=="-"?`ตั้งแต่ ${row.offlineSince}`:"";
-  $(` + '"boot-"+sx' + `).textContent=row.bootCount&&row.bootCount!=="-"?`#${row.bootCount}`:"—";
-  const aa=$(` + '"oalert-"+sx' + `);
+    const m=row.diffMinutes;
+    if(pa){ pa.textContent=m<1?"เมื่อกี้นี้":`${m} นาทีที่แล้ว`; pa.className="infosub"+(m>=8?" warn":""); }
+  } else { if(pa){ pa.textContent=""; pa.className="infosub"; } }
+  $("offdur-"+sx).textContent=row.offlineDuration&&row.offlineDuration!=="-"?row.offlineDuration:"—";
+  $("offsince-"+sx).textContent=row.offlineSince&&row.offlineSince!=="-"?`ตั้งแต่ ${row.offlineSince}`:"";
+  $("boot-"+sx).textContent=row.bootCount&&row.bootCount!=="-"?`#${row.bootCount}`:"—";
+  const aa=$("oalert-"+sx);
   if(row.offlineAlertAt&&row.offlineAlertAt!=="-"){
-    aa.style.display="flex"; $(` + '"oalert-"+sx+"-txt"' + `).textContent=`แจ้งเตือน ${row.offlineAlertAt}`;
+    aa.style.display="flex"; $("oalert-"+sx+"-txt").textContent=`แจ้งเตือน ${row.offlineAlertAt}`;
   } else { aa.style.display="none"; }
   setUptime(sx,row.offlineDuration&&row.offlineDuration!=="-"?row.offlineDuration:null);
 }
@@ -482,9 +483,9 @@ function renderMetrics(s,lc){
 
 function setFilter(f){
   activeFilter=f;
-  $("f-all").className="fbtn"+(f==="all"?" fa":"");
-  $("f-550").className="fbtn"+(f==="550"?" f550":"");
-  $("f-370").className="fbtn"+(f==="370"?" f370":"");
+  $c("f-all","fbtn"+(f==="all"?" fa":""));
+  $c("f-550","fbtn"+(f==="550"?" f550":""));
+  $c("f-370","fbtn"+(f==="370"?" f370":""));
   renderLogs(allLogs);
 }
 function renderLogs(rows){
@@ -554,7 +555,7 @@ async function poll(){
     const n=nowBKK();
     $("last-sync").textContent=`${pad(n.getHours())}:${pad(n.getMinutes())}:${pad(n.getSeconds())}`;
   }catch(e){setConn("err");showError("เกิดข้อผิดพลาด: "+e.message);}
-  setSpin(false);$("loading").classList.add("hide");
+  setSpin(false); const ld=$("loading"); if(ld) ld.classList.add("hide");
   const anyDown=document.querySelector(".gen-card.stopped,.gen-card.offline");
   const delay=anyDown?8000:15000;
   startCd(delay);pollTimer=setTimeout(poll,delay);
