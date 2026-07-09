@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<!-- GEN Monitor Final Complete Dashboard v4.1.0 Thai Status Fix -->
+<html lang="th">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>แดชบอร์ดเครื่องปั่นไฟ — GEN Monitor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#05070d;--bg2:#080d18;--panel:#0b1220;--panel2:#101a2b;--glass:rgba(16,26,43,.72);
+  --line:#1b2e4d;--line2:#29476d;--muted:#647895;--text:#e7f0ff;--soft:#9fb3d0;
+  --cyan:#20d9ff;--cyan2:#67f8ff;--blue:#3b82f6;--green:#22c55e;--green2:#7dffae;
+  --red:#ff3b6b;--red2:#ff8aa6;--amber:#f59e0b;--violet:#a78bfa;--gray:#64748b;
+  --shadowC:0 0 24px rgba(32,217,255,.32);--shadowG:0 0 28px rgba(34,197,94,.34);--shadowR:0 0 32px rgba(255,59,107,.38);
+  --font:'IBM Plex Sans Thai',sans-serif;--mono:'JetBrains Mono',monospace;--tech:'Orbitron',sans-serif;
+  --r:22px;--r2:14px;
+}
+*{box-sizing:border-box;margin:0;padding:0}html,body{min-height:100%}
+body{font-family:var(--font);color:var(--text);background:radial-gradient(circle at 18% 12%,rgba(32,217,255,.12),transparent 34%),radial-gradient(circle at 85% 18%,rgba(167,139,250,.12),transparent 31%),radial-gradient(circle at 65% 86%,rgba(255,59,107,.10),transparent 34%),var(--bg);overflow-x:hidden;}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;background-image:linear-gradient(rgba(32,217,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(32,217,255,.045) 1px,transparent 1px);background-size:46px 46px;mask-image:radial-gradient(circle at center,#000 0%,transparent 82%);z-index:-3}
+body:after{content:"";position:fixed;inset:0;pointer-events:none;background:linear-gradient(transparent 50%,rgba(255,255,255,.018) 51%);background-size:100% 4px;mix-blend-mode:screen;opacity:.34;z-index:50}
+.orb{position:fixed;border-radius:50%;filter:blur(38px);opacity:.35;pointer-events:none;animation:float 13s ease-in-out infinite alternate;z-index:-2}.orb.o1{width:300px;height:300px;background:var(--cyan);top:12%;left:-120px}.orb.o2{width:260px;height:260px;background:var(--red);bottom:4%;right:-100px;animation-delay:2s}.orb.o3{width:220px;height:220px;background:var(--violet);top:40%;right:18%;animation-delay:5s}@keyframes float{to{transform:translate3d(34px,-28px,0) scale(1.08)}}
+#topbar{position:fixed;top:0;left:0;height:3px;width:0;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));box-shadow:var(--shadowC);z-index:1000;transition:width .2s linear}
+.shell{max-width:1360px;margin:0 auto;padding:24px 18px 70px}
+header{height:76px;display:flex;align-items:center;justify-content:space-between;gap:18px;margin-bottom:22px;padding:0 6px}.brand{display:flex;align-items:center;gap:14px}.mark{width:48px;height:48px;border:1px solid rgba(32,217,255,.45);border-radius:16px;background:linear-gradient(145deg,rgba(32,217,255,.18),rgba(59,130,246,.04));box-shadow:inset 0 1px 0 rgba(255,255,255,.08),var(--shadowC);display:grid;place-items:center;position:relative;overflow:hidden}.mark:before{content:"";position:absolute;width:120%;height:120%;background:conic-gradient(transparent,var(--cyan),transparent 32%);animation:spin 5s linear infinite;opacity:.42}.mark svg{width:25px;height:25px;z-index:1;filter:drop-shadow(0 0 10px var(--cyan))}.title{font-family:var(--tech);font-size:20px;letter-spacing:.08em;font-weight:900}.sub{font-size:11px;color:var(--muted);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}.hud{display:flex;align-items:center;gap:10px}.clock{font-family:var(--tech);font-size:24px;color:var(--cyan2);letter-spacing:.08em;text-shadow:0 0 16px rgba(32,217,255,.55)}.date{font-family:var(--mono);font-size:11px;color:var(--muted);text-align:right}.badge{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:rgba(8,13,24,.75);border-radius:999px;padding:8px 13px;color:var(--soft);font-family:var(--mono);font-size:12px}.dot{width:8px;height:8px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px rgba(245,158,11,.5)}.badge.ok{color:var(--green2);border-color:rgba(34,197,94,.45);box-shadow:0 0 18px rgba(34,197,94,.09)}.badge.ok .dot{background:var(--green);box-shadow:0 0 12px var(--green)}.badge.err{color:var(--red2);border-color:rgba(255,59,107,.45)}.badge.err .dot{background:var(--red);box-shadow:0 0 12px var(--red)}button{font-family:var(--font)}.btn{border:1px solid var(--line2);color:var(--cyan2);background:linear-gradient(180deg,rgba(32,217,255,.10),rgba(32,217,255,.03));border-radius:13px;height:40px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 0 0 rgba(32,217,255,0);transition:.25s}.btn:hover{transform:translateY(-1px);box-shadow:var(--shadowC);border-color:var(--cyan)}.btn.spin svg{animation:spin .7s linear infinite}.btn svg{width:16px;height:16px}
+.warnbox{display:none;border:1px solid rgba(255,59,107,.36);background:linear-gradient(90deg,rgba(255,59,107,.14),rgba(255,59,107,.04));border-radius:16px;padding:13px 16px;margin-bottom:18px;color:var(--red2);box-shadow:0 0 26px rgba(255,59,107,.1)}
+.metrics{display:grid;grid-template-columns:repeat(5,1fr);gap:14px;margin-bottom:20px}.metric{position:relative;background:linear-gradient(180deg,rgba(16,26,43,.82),rgba(10,18,32,.7));border:1px solid var(--line);border-radius:18px;padding:17px;overflow:hidden;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}.metric:after{content:"";position:absolute;left:0;right:0;bottom:0;height:2px;background:currentColor;opacity:.5}.metric .lbl{font-size:10px;letter-spacing:.13em;color:var(--muted);text-transform:uppercase;font-weight:700}.metric .val{font-family:var(--tech);font-size:30px;font-weight:900;margin-top:8px;line-height:1}.metric .mini{font-size:11px;color:var(--muted);margin-top:8px}.c{color:var(--cyan)}.g{color:var(--green2)}.r{color:var(--red2)}.a{color:var(--amber)}.v{color:var(--violet)}
+.section{display:flex;align-items:center;gap:12px;margin:20px 0 14px}.section span{font-size:11px;text-transform:uppercase;letter-spacing:.18em;color:var(--muted);font-weight:800}.section:after{content:"";height:1px;background:linear-gradient(90deg,var(--line),transparent);flex:1}.machine-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}.card{position:relative;min-height:360px;background:linear-gradient(180deg,rgba(16,26,43,.88),rgba(8,13,24,.84));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;padding:22px;box-shadow:0 16px 60px rgba(0,0,0,.32),inset 0 1px 0 rgba(255,255,255,.05);transition:.45s}.card:before{content:"";position:absolute;inset:-2px;background:radial-gradient(circle at 82% 18%,rgba(32,217,255,.22),transparent 28%),linear-gradient(120deg,transparent 0%,rgba(255,255,255,.045) 45%,transparent 58%);opacity:.55;pointer-events:none}.card:after{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--gray);box-shadow:0 0 16px var(--gray)}.card.run{border-color:rgba(34,197,94,.45);box-shadow:0 16px 60px rgba(0,0,0,.32),var(--shadowG)}.card.run:after{background:var(--green);box-shadow:0 0 24px var(--green)}.card.off{border-color:rgba(255,59,107,.55);box-shadow:0 16px 60px rgba(0,0,0,.32),var(--shadowR);animation:redBreath 1.9s ease-in-out infinite}.card.off:after{background:var(--red);box-shadow:0 0 32px var(--red);animation:barAlarm .85s linear infinite}.card.offline{filter:saturate(.55);border-color:rgba(100,116,139,.4)}.card.unknown{border-color:rgba(245,158,11,.45)}@keyframes redBreath{50%{box-shadow:0 16px 60px rgba(0,0,0,.32),0 0 48px rgba(255,59,107,.48)}}@keyframes barAlarm{50%{opacity:.42}}.card-head{display:flex;align-items:flex-start;justify-content:space-between;position:relative;z-index:1}.machine-name{font-family:var(--tech);font-size:21px;font-weight:900;letter-spacing:.05em}.machine-code{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:4px}.status-pill{border:1px solid var(--line);border-radius:999px;padding:7px 13px;font-family:var(--tech);font-size:12px;font-weight:800;letter-spacing:.08em;background:rgba(0,0,0,.18);display:flex;align-items:center;gap:8px}.status-pill:before{content:"";width:8px;height:8px;border-radius:50%;background:var(--gray)}.card.run .status-pill{color:var(--green2);border-color:rgba(34,197,94,.55)}.card.run .status-pill:before{background:var(--green);box-shadow:0 0 13px var(--green);animation:pulseGreen 2s infinite}.card.off .status-pill{color:var(--red2);border-color:rgba(255,59,107,.6)}.card.off .status-pill:before{background:var(--red);box-shadow:0 0 13px var(--red);animation:pulseRed 1s infinite}.card.unknown .status-pill{color:var(--amber);border-color:rgba(245,158,11,.55)}.card.unknown .status-pill:before{background:var(--amber)}@keyframes pulseGreen{50%{box-shadow:0 0 0 8px transparent}}@keyframes pulseRed{50%{box-shadow:0 0 0 9px transparent}}
+.core{display:grid;grid-template-columns:170px 1fr;gap:22px;margin:24px 0 18px;position:relative;z-index:1}.ring{width:168px;height:168px;border-radius:50%;position:relative;display:grid;place-items:center;background:conic-gradient(var(--gray) 0 80%,rgba(100,116,139,.12) 80% 100%);box-shadow:inset 0 0 28px rgba(0,0,0,.5)}.ring:before{content:"";position:absolute;inset:10px;border-radius:50%;background:var(--panel);border:1px solid var(--line)}.ring:after{content:"";position:absolute;inset:-5px;border-radius:50%;border:1px dashed rgba(32,217,255,.24);animation:spin 12s linear infinite}.card.run .ring{background:conic-gradient(var(--green) 0 96%,rgba(34,197,94,.08) 96% 100%);box-shadow:inset 0 0 28px rgba(0,0,0,.5),0 0 35px rgba(34,197,94,.24)}.card.off .ring{background:conic-gradient(var(--red) 0 28%,rgba(255,59,107,.08) 28% 100%);box-shadow:inset 0 0 28px rgba(0,0,0,.5),0 0 35px rgba(255,59,107,.25)}.ring-inner{position:relative;z-index:1;text-align:center}.ring-status{font-family:var(--tech);font-size:30px;font-weight:900}.ring-lbl{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.12em;margin-top:5px}.info{display:grid;gap:10px}.line{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(41,71,109,.45);padding-bottom:8px}.line .k{font-size:11px;color:var(--muted);font-weight:700;text-transform:uppercase;letter-spacing:.08em}.line .v{font-family:var(--mono);font-size:12px;color:var(--text);text-align:right}.board{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line);padding:5px 10px;border-radius:999px;font-size:11px;font-family:var(--mono)}.board.online{color:var(--cyan2);border-color:rgba(32,217,255,.45);background:rgba(32,217,255,.07)}.board.offline{color:var(--red2);border-color:rgba(255,59,107,.45);background:rgba(255,59,107,.08)}.board.unknown{color:var(--amber);border-color:rgba(245,158,11,.45)}.wifi{height:7px;border-radius:999px;background:rgba(100,116,139,.2);overflow:hidden;border:1px solid rgba(41,71,109,.5);margin-top:7px}.wifi>i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--red),var(--amber),var(--green));transition:width 1s ease}.alarm-strip{display:none;position:absolute;left:0;right:0;bottom:0;padding:12px 22px;background:linear-gradient(90deg,rgba(255,59,107,.22),rgba(255,59,107,.04));border-top:1px solid rgba(255,59,107,.35);font-weight:700;color:var(--red2);z-index:2}.card.off .alarm-strip{display:block;animation:alarmText 1.3s infinite}@keyframes alarmText{50%{filter:brightness(1.55)}}@keyframes spin{to{transform:rotate(360deg)}}
+.log-panel{background:linear-gradient(180deg,rgba(16,26,43,.82),rgba(8,13,24,.76));border:1px solid var(--line);border-radius:var(--r);overflow:hidden;box-shadow:0 16px 60px rgba(0,0,0,.26)}.log-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 18px;background:rgba(8,13,24,.72);border-bottom:1px solid var(--line)}.log-title{font-weight:800}.log-sub{font-size:11px;color:var(--muted);margin-top:2px}.filters{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.chip{border:1px solid var(--line);background:rgba(255,255,255,.025);color:var(--soft);border-radius:999px;padding:6px 12px;cursor:pointer;font-size:12px}.chip.active,.chip:hover{border-color:var(--cyan);color:var(--cyan2);box-shadow:0 0 16px rgba(32,217,255,.12)}.table-wrap{overflow:auto;max-height:420px}table{width:100%;border-collapse:collapse;min-width:850px}th{font-size:10px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;text-align:left;padding:12px 16px;border-bottom:1px solid var(--line);background:rgba(5,7,13,.65);position:sticky;top:0;z-index:1}td{padding:12px 16px;border-bottom:1px solid rgba(27,46,77,.55);font-size:12px}tr:hover td{background:rgba(32,217,255,.035)}.tag{font-family:var(--mono);font-weight:700;border-radius:7px;padding:3px 9px;font-size:11px}.m550{color:#83b7ff;background:rgba(59,130,246,.14);border:1px solid rgba(59,130,246,.35)}.m370{color:#ffd28a;background:rgba(245,158,11,.13);border:1px solid rgba(245,158,11,.34)}.mono{font-family:var(--mono)}.dur{color:var(--amber);font-family:var(--mono);font-weight:700}.dur.long{color:var(--red2)}.empty{text-align:center;color:var(--muted);padding:38px!important}.foot{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px;color:var(--muted);font-family:var(--mono);font-size:11px}
+#toast{position:fixed;left:50%;bottom:26px;transform:translate(-50%,70px);background:rgba(16,26,43,.92);border:1px solid var(--line2);border-radius:14px;padding:11px 18px;color:var(--soft);box-shadow:0 18px 60px rgba(0,0,0,.55);transition:.28s;z-index:1200}#toast.show{transform:translate(-50%,0)}
+.loader{position:fixed;inset:0;background:var(--bg);display:grid;place-items:center;z-index:1100;transition:.45s}.loader.hide{opacity:0;pointer-events:none}.loadbox{text-align:center}.loadring{width:58px;height:58px;border-radius:50%;border:2px solid var(--line);border-top-color:var(--cyan);box-shadow:var(--shadowC);animation:spin .7s linear infinite;margin:0 auto 16px}.loadbox p{font-family:var(--mono);color:var(--muted)}
+@media(max-width:980px){.metrics{grid-template-columns:repeat(2,1fr)}.machine-grid{grid-template-columns:1fr}.core{grid-template-columns:1fr}.ring{margin:auto}header{height:auto;align-items:flex-start;flex-direction:column}.hud{width:100%;justify-content:space-between}}@media(max-width:560px){.metrics{grid-template-columns:1fr}.shell{padding:16px 10px 50px}.clock{font-size:20px}.card{padding:18px}.machine-name{font-size:17px}.log-head{align-items:flex-start;flex-direction:column}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="orb o1"></div><div class="orb o2"></div><div class="orb o3"></div><div id="topbar"></div>
+<div class="loader" id="loader"><div class="loadbox"><div class="loadring"></div><p>กำลังโหลดแดชบอร์ดเครื่องปั่นไฟ...</p></div></div>
+<div class="shell">
+<header>
+  <div class="brand"><div class="mark"><svg viewBox="0 0 24 24" fill="none" stroke="var(--cyan2)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></div><div><div class="title">แดชบอร์ดเครื่องปั่นไฟ</div><div class="sub">ฟาร์มจักราช / ระบบติดตามสถานะอัตโนมัติ</div></div></div>
+  <div class="hud"><div><div class="clock" id="clock">--:--:--</div><div class="date" id="date">--</div></div><div class="badge" id="conn"><span class="dot"></span><span id="connText">กำลังเชื่อมต่อ</span></div><button class="btn" id="refreshBtn" onclick="manualRefresh()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-15.5 6.2M3 12A9 9 0 0 1 18.5 5.8"/><path d="M18 3v4h4M6 21v-4H2"/></svg>รีเฟรช</button></div>
+</header>
+<div class="warnbox" id="warnbox"></div>
+<section class="metrics">
+  <div class="metric c"><div class="lbl">บอร์ดทั้งหมด</div><div class="val" id="mTotal">0</div><div class="mini">จำนวน ESP32 ทั้งหมด</div></div>
+  <div class="metric g"><div class="lbl">ออนไลน์</div><div class="val" id="mOnline">0</div><div class="mini">บอร์ดส่งข้อมูลปกติ</div></div>
+  <div class="metric r"><div class="lbl">ขาดการติดต่อ</div><div class="val" id="mOffline">0</div><div class="mini">ไม่ได้รับข้อมูลเกินกำหนด</div></div>
+  <div class="metric g"><div class="lbl">กำลังทำงาน</div><div class="val" id="mRun">0</div><div class="mini">สถานะ RUN</div></div>
+  <div class="metric r"><div class="lbl">เครื่องดับ</div><div class="val" id="mOff">0</div><div class="mini">สถานะ OFF</div></div>
+</section>
+<div class="section"><span>สถานะเครื่องปั่นไฟแบบเรียลไทม์</span></div>
+<section class="machine-grid" id="machineGrid"></section>
+<div class="section"><span>ประวัติการดับและติดกลับ</span></div>
+<section class="log-panel">
+  <div class="log-head"><div><div class="log-title">ประวัติเครื่องดับ / ติดกลับ</div><div class="log-sub" id="logSub">รอข้อมูล...</div></div><div class="filters"><button class="chip active" data-filter="ALL" onclick="setFilter('ALL')">ทั้งหมด</button><button class="chip" data-filter="550" onclick="setFilter('550')">550 KW</button><button class="chip" data-filter="370" onclick="setFilter('370')">370 KW</button><button class="chip" onclick="exportCsv()">ส่งออก CSV</button></div></div>
+  <div class="table-wrap"><table><thead><tr><th>เครื่อง</th><th>วันที่</th><th>เวลาดับ</th><th>เวลาติด</th><th>ดับครั้งนี้</th><th>สะสม</th><th>รับข้อมูล</th></tr></thead><tbody id="logBody"><tr><td class="empty" colspan="7">กำลังโหลด...</td></tr></tbody></table></div>
+</section>
+<div class="foot"><div id="lastSync">อัปเดตล่าสุด: -</div><div>รีเฟรชอัตโนมัติ: <span id="nextRefresh">30</span>s / API JSONP</div></div>
+</div>
+<div id="toast">อัปเดตแล้ว</div>
+<script>
+/******************** CONFIG ********************/
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbwm2PBHIVJLF5Rtb8l1q7FkDYtXmnKp8FMebtsKOH4YA7RNqNuktd6cgDvhpmkmWrV7Ug/exec'; // ต้องเป็น URL /exec จาก Apps Script
+const REFRESH_MS = 30000;
+const LOG_LIMIT = 150;
+
+let currentFilter = 'ALL';
+let lastLogs = [];
+let refreshTimer = null;
+let countdownTimer = null;
+let nextRemain = REFRESH_MS / 1000;
+
+function isConfigured(){ return GAS_URL && !GAS_URL.includes('PUT_YOUR') && GAS_URL.startsWith('https://script.google.com/'); }
+function $(id){ return document.getElementById(id); }
+function esc(v){ return String(v ?? '').replace(/[&<>'"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c])); }
+function fmtNum(v){ return Number(v || 0).toLocaleString('th-TH'); }
+function statusClass(ms, bs){ if(bs === 'Offline') return 'offline'; ms = String(ms||'').toUpperCase(); if(ms === 'RUN') return 'run'; if(ms === 'OFF') return 'off'; return 'unknown'; }
+function boardClass(bs){ if(bs === 'Online') return 'online'; if(bs === 'Offline') return 'offline'; return 'unknown'; }
+function thMachineStatus(v){ v=String(v||'UNKNOWN').toUpperCase(); if(v==='RUN') return 'กำลังทำงาน'; if(v==='OFF') return 'เครื่องดับ'; return 'ไม่ทราบสถานะ'; }
+function thBoardStatus(v){ v=String(v||'Unknown'); if(v==='Online') return 'ออนไลน์'; if(v==='Offline') return 'ขาดการติดต่อ'; return 'ไม่ทราบสถานะ'; }
+function safeText(v, fallback='-'){ const s=String(v ?? '').trim(); if(!s || s==='-' || s.includes('1899-12-30')) return fallback; return s.length>140?s.slice(0,140)+'...':s; }
+function shortError(v){ const s=safeText(v,''); if(!s) return ''; if(s.includes('<html')||s.includes('<!DOCTYPE')) return 'ได้รับ HTML error จาก server'; return s.length>120?s.slice(0,120)+'...':s; }
+function machineTag(machine){ return String(machine).includes('550') ? 'm550' : (String(machine).includes('370') ? 'm370' : ''); }
+function cleanMs(v){
+  let n = Number(v);
+  if(!Number.isFinite(n) || n < 0) return 0;
+  if(n > 10 * 365 * 24 * 60 * 60 * 1000) return 0;
+  return Math.round(n);
+}
+function fmtMsLocal(ms){
+  ms = cleanMs(ms);
+  const total = Math.floor(ms / 1000);
+  const days = Math.floor(total / 86400);
+  const h = Math.floor((total % 86400) / 3600);
+  const m = Math.floor((total % 3600) / 60);
+  const s = total % 60;
+  const pad = n => String(Math.max(0, n)).padStart(2, '0');
+  return days > 0 ? `${days} วัน ${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(h)}:${pad(m)}:${pad(s)}`;
+}
+function offCritical(ms){ return cleanMs(ms) >= 15 * 60 * 1000; }
+function durationLong(text){ const h = String(text||'').match(/(\d+):/); return h && Number(h[1]) >= 1; }
+
+function updateClock(){ const now = new Date(); $('clock').textContent = now.toLocaleTimeString('th-TH',{hour12:false}); $('date').textContent = now.toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+setInterval(updateClock, 1000); updateClock();
+
+function setConn(ok, text){ const c=$('conn'); c.className = 'badge ' + (ok ? 'ok' : 'err'); $('connText').textContent = text; }
+function warn(msg){ const w=$('warnbox'); if(!msg){w.style.display='none';w.textContent='';return;} w.style.display='block'; w.textContent='⚠ ' + msg; }
+function toast(msg){ const t=$('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2200); }
+
+function jsonp(action, params={}){
+  return new Promise((resolve,reject)=>{
+    if(!isConfigured()) return reject(new Error('ยังไม่ได้ตั้งค่า GAS_URL ในไฟล์ Dashboard'));
+    const cb = '__gen_cb_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    const url = new URL(GAS_URL);
+    url.searchParams.set('action', action);
+    url.searchParams.set('callback', cb);
+    url.searchParams.set('_', Date.now());
+    Object.keys(params).forEach(k => url.searchParams.set(k, params[k]));
+    const script = document.createElement('script');
+    const timer = setTimeout(()=>{ cleanup(); reject(new Error('API timeout: ' + action)); }, 12000);
+    function cleanup(){ clearTimeout(timer); delete window[cb]; if(script.parentNode) script.parentNode.removeChild(script); }
+    window[cb] = data => { cleanup(); resolve(data); };
+    script.onerror = () => { cleanup(); reject(new Error('โหลด API ไม่สำเร็จ: ' + action)); };
+    script.src = url.toString();
+    document.body.appendChild(script);
+  });
+}
+
+function renderSummary(summary){ summary = summary || {}; $('mTotal').textContent=fmtNum(summary.total); $('mOnline').textContent=fmtNum(summary.online); $('mOffline').textContent=fmtNum(summary.offline); $('mRun').textContent=fmtNum(summary.run); $('mOff').textContent=fmtNum(summary.off); }
+
+function renderMachines(rows){
+  const grid = $('machineGrid');
+  rows = Array.isArray(rows) ? rows : [];
+  if(rows.length === 0){ grid.innerHTML = '<div class="warnbox" style="display:block;grid-column:1/-1">ไม่พบข้อมูล Status — ตรวจสอบว่า ESP32 ส่ง Ping แล้ว หรือ Run initializeGenMonitor ใน Apps Script</div>'; return; }
+  grid.innerHTML = rows.map(r=>{
+    const cls = statusClass(r.machineStatus, r.boardStatus);
+    const bcls = boardClass(r.boardStatus);
+    const wifiLevel = r.wifiQuality && r.wifiQuality.level ? r.wifiQuality.level : 0;
+    const curOffText = fmtMsLocal(r.currentOffMs);
+    const totalOffText = fmtMsLocal(r.totalOffMs);
+    const alarm = String(r.machineStatus).toUpperCase()==='OFF' ? `แจ้งเตือน: เครื่องดับต่อเนื่อง ${esc(curOffText)}${offCritical(r.currentOffMs)?' / ระดับวิกฤต':''}` : '';
+    const lastErr = shortError(r.lastError);
+    return `<article class="card ${cls}">
+      <div class="card-head"><div><div class="machine-name">${esc(r.machine)}</div><div class="machine-code">รหัส ${esc(r.machineId || '-')} / ${esc(r.firmware || '-')}</div></div><div class="status-pill">${esc(thMachineStatus(r.machineStatus))}</div></div>
+      <div class="core"><div class="ring"><div class="ring-inner"><div class="ring-status">${String(r.machineStatus).toUpperCase()==='RUN'?'RUN':String(r.machineStatus).toUpperCase()==='OFF'?'OFF':'---'}</div><div class="ring-lbl">สถานะเครื่อง</div></div></div>
+      <div class="info">
+        <div class="line"><span class="k">บอร์ด ESP32</span><span class="v"><span class="board ${bcls}">${esc(thBoardStatus(r.boardStatus))}</span></span></div>
+        <div class="line"><span class="k">รับข้อมูลล่าสุด</span><span class="v">${esc(r.lastPing || '-')} ${r.diffMinutes!==null?`(${esc(r.diffMinutes)} นาที)`:''}</span></div>
+        <div class="line"><span class="k">เริ่มสถานะนี้</span><span class="v">${esc(safeText(r.stateSince,'ไม่พบเวลา'))}</span></div>
+        <div class="line"><span class="k">ดับต่อเนื่อง</span><span class="v ${offCritical(r.currentOffMs)?'r':''}">${esc(curOffText)}</span></div>
+        <div class="line"><span class="k">ดับสะสมทั้งหมด</span><span class="v">${esc(totalOffText)}</span></div>
+        <div class="line"><span class="k">บูต / IP</span><span class="v">${esc(r.bootCount || '-')} / ${esc(r.ip || '-')}</span></div>
+        <div><div class="line" style="border-bottom:0;padding-bottom:4px"><span class="k">สัญญาณ Wi‑Fi</span><span class="v">${esc(r.rssi ?? '-')} dBm / ${esc(r.wifiQuality?.label || '-')}</span></div><div class="wifi"><i style="width:${wifiLevel}%"></i></div></div>
+        <div class="line"><span class="k">แหล่งข้อมูลล่าสุด</span><span class="v">${esc(r.lastSource || '-')}</span></div>
+        ${lastErr ? `<div class="line"><span class="k">ข้อผิดพลาดล่าสุด</span><span class="v" style="color:var(--amber)">${esc(lastErr)}</span></div>` : ''}
+      </div></div>
+      <div class="alarm-strip">${alarm}</div>
+    </article>`;
+  }).join('');
+}
+
+function renderLogs(){
+  const body = $('logBody');
+  let logs = lastLogs || [];
+  if(currentFilter !== 'ALL') logs = logs.filter(l => String(l.machine).includes(currentFilter));
+  $('logSub').textContent = `แสดง ${logs.length} รายการล่าสุด / ตัวกรอง: ${currentFilter}`;
+  if(logs.length === 0){ body.innerHTML = '<tr><td class="empty" colspan="7">ไม่พบข้อมูล Log</td></tr>'; return; }
+  body.innerHTML = logs.map(l=>`<tr>
+    <td><span class="tag ${machineTag(l.machine)}">${esc(l.machine)}</span></td><td class="mono">${esc(l.date)}</td><td class="mono">${esc(l.time_off)}</td><td class="mono">${esc(l.time_on)}</td><td class="dur ${durationLong(l.duration)?'long':''}">${esc(l.duration)}</td><td class="dur">${esc(l.total_all)}</td><td class="mono">${esc(l.received_at)}</td>
+  </tr>`).join('');
+}
+
+function setFilter(f){ currentFilter=f; document.querySelectorAll('.chip[data-filter]').forEach(b=>b.classList.toggle('active',b.dataset.filter===f)); renderLogs(); }
+
+async function refreshAll(manual=false){
+  const btn=$('refreshBtn'); btn.classList.add('spin'); $('topbar').style.width='18%';
+  try{
+    warn('');
+    const [dash, logs] = await Promise.all([jsonp('getDashboardData'), jsonp('getLogs',{limit:LOG_LIMIT})]);
+    if(!dash.ok) throw new Error(dash.error || 'Dashboard API error');
+    if(!logs.ok) throw new Error(logs.error || 'Logs API error');
+    renderSummary(dash.summary); renderMachines(dash.rows); lastLogs = logs.logs || []; renderLogs();
+    $('lastSync').textContent = `อัปเดตล่าสุด: ${dash.now || new Date().toLocaleString('th-TH')} / API ${dash.version || '-'}`;
+    setConn(true,'เชื่อมต่อแล้ว'); if(manual) toast('รีเฟรชข้อมูลสำเร็จ');
+  }catch(err){ setConn(false,'มีข้อผิดพลาด'); warn(err.message); toast('เชื่อมต่อข้อมูลไม่ได้'); }
+  finally{ btn.classList.remove('spin'); $('topbar').style.width='100%'; setTimeout(()=>$('topbar').style.width='0%',350); $('loader').classList.add('hide'); resetCountdown(); }
+}
+function manualRefresh(){ refreshAll(true); }
+function resetCountdown(){ nextRemain = Math.floor(REFRESH_MS/1000); $('nextRefresh').textContent = nextRemain; clearTimeout(refreshTimer); refreshTimer = setTimeout(()=>refreshAll(false), REFRESH_MS); }
+setInterval(()=>{ nextRemain=Math.max(0,nextRemain-1); $('nextRefresh').textContent=nextRemain; $('topbar').style.width = `${100 - (nextRemain/(REFRESH_MS/1000))*100}%`; },1000);
+
+function exportCsv(){
+  let logs = lastLogs || []; if(currentFilter!=='ALL') logs = logs.filter(l=>String(l.machine).includes(currentFilter));
+  const header = ['machine','date','time_off','time_on','duration','total_all','received_at'];
+  const lines = [header.join(',')].concat(logs.map(l=>header.map(k=>'"'+String(l[k]??'').replace(/"/g,'""')+'"').join(',')));
+  const blob = new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='gen_downtime_logs.csv'; a.click(); URL.revokeObjectURL(a.href);
+}
+
+(function init(){ if(!isConfigured()){ $('loader').classList.add('hide'); setConn(false,'ยังไม่ตั้งค่า URL'); warn('กรุณาใส่ GAS_URL เป็น Google Apps Script Web App URL ที่ลงท้าย /exec ก่อนใช้งาน'); return; } refreshAll(false); })();
+</script>
+</body>
+</html>
